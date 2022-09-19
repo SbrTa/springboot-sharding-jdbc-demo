@@ -1,0 +1,8 @@
+/target
+/.idea/
+/.mvn/
+/logs/
+/target/
+/mvnw.cmd
+/mvnw
+/springboot-sharding-jdbc-demo.iml

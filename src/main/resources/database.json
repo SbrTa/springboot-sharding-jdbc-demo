@@ -1,0 +1,16 @@
+[
+  {
+    "name": "db_sh",
+    "url": "jdbc:mysql://localhost:3306/db_sh",
+    "username": "root",
+    "password": "",
+    "driveClassName":"com.mysql.jdbc.Driver"
+  },
+  {
+    "name": "db_sz",
+    "url": "jdbc:mysql://localhost:3306/db_sz",
+    "username": "root",
+    "password": "",
+    "driveClassName":"com.mysql.jdbc.Driver"
+  }
+]
