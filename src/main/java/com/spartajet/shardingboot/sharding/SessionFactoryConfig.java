@@ -10,14 +10,9 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
 
-/**
- * @description
- * @create 2017-02-07 下午10:03
- * @email gxz04220427@163.com
- */
 @Configuration
 @MapperScan(basePackages = "com.spartajet.shardingboot.mapper", sqlSessionFactoryRef = "sessionFactory")
-public class TickSessionFactoryConfig {
+public class SessionFactoryConfig {
     @Bean
     public SqlSessionFactory sessionFactory(DataSource shardingDataSource) throws Exception {
         final SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();

@@ -24,8 +24,8 @@ public class ShardingUtils {
             valueSet.add("a");
             valueSet.add("b");
         }else if("time".equals(shardingKey)){
-            valueSet.add(LocalDate.of(2017,4,1));
-            valueSet.add(LocalDate.of(2017,5,1));
+            valueSet.add(LocalDate.of(2022,8,1));
+            valueSet.add(LocalDate.of(2022,9,1));
         }else if("exchange".equals(shardingKey)){
             valueSet.add("sh");
             valueSet.add("sz");

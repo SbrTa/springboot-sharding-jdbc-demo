@@ -1,47 +1,10 @@
 DROP DATABASE IF EXISTS db_sh;
-DROP TABLE IF EXISTS db_sh.tick_a_2017_04;
-CREATE TABLE db_sh.tick_a_2017_04
-(
-  id BIGINT(20) PRIMARY KEY NOT NULL,
-  name VARCHAR(2),
-  exchange VARCHAR(10),
-  ask INT(11),
-  bid INT(11),
-  time DATETIME
-);
-DROP TABLE IF EXISTS db_sh.tick_a_2017_05;
-CREATE TABLE db_sh.tick_a_2017_05
-(
-  id BIGINT(20) PRIMARY KEY NOT NULL,
-  name VARCHAR(2),
-  exchange VARCHAR(10),
-  ask INT(11),
-  bid INT(11),
-  time DATETIME
-);
-DROP TABLE IF EXISTS db_sh.tick_b_2017_04;
-CREATE TABLE db_sh.tick_b_2017_04
-(
-  id BIGINT(20) PRIMARY KEY NOT NULL,
-  name VARCHAR(2),
-  exchange VARCHAR(10),
-  ask INT(11),
-  bid INT(11),
-  time DATETIME
-);
-DROP TABLE IF EXISTS db_sh.tick_b_2017_05;
-CREATE TABLE db_sh.tick_b_2017_05
-(
-  id BIGINT(20) PRIMARY KEY NOT NULL,
-  name VARCHAR(2),
-  exchange VARCHAR(10),
-  ask INT(11),
-  bid INT(11),
-  time DATETIME
-);
 DROP DATABASE IF EXISTS db_sz;
-DROP TABLE IF EXISTS db_sz.tick_a_2017_04;
-CREATE TABLE db_sz.tick_a_2017_04
+CREATE DATABASE db_sh;
+CREATE DATABASE db_sz;
+
+DROP TABLE IF EXISTS db_sh.payment_a_2022_08;
+CREATE TABLE db_sh.payment_a_2022_08
 (
   id BIGINT(20) PRIMARY KEY NOT NULL,
   name VARCHAR(2),
@@ -50,8 +13,8 @@ CREATE TABLE db_sz.tick_a_2017_04
   bid INT(11),
   time DATETIME
 );
-DROP TABLE IF EXISTS db_sz.tick_a_2017_05;
-CREATE TABLE db_sz.tick_a_2017_05
+DROP TABLE IF EXISTS db_sh.payment_a_2022_09;
+CREATE TABLE db_sh.payment_a_2022_09
 (
   id BIGINT(20) PRIMARY KEY NOT NULL,
   name VARCHAR(2),
@@ -60,8 +23,8 @@ CREATE TABLE db_sz.tick_a_2017_05
   bid INT(11),
   time DATETIME
 );
-DROP TABLE IF EXISTS db_sz.tick_b_2017_04;
-CREATE TABLE db_sz.tick_b_2017_04
+DROP TABLE IF EXISTS db_sh.payment_b_2022_08;
+CREATE TABLE db_sh.payment_b_2022_08
 (
   id BIGINT(20) PRIMARY KEY NOT NULL,
   name VARCHAR(2),
@@ -70,8 +33,48 @@ CREATE TABLE db_sz.tick_b_2017_04
   bid INT(11),
   time DATETIME
 );
-DROP TABLE IF EXISTS db_sz.tick_b_2017_05;
-CREATE TABLE db_sz.tick_b_2017_05
+DROP TABLE IF EXISTS db_sh.payment_b_2022_09;
+CREATE TABLE db_sh.payment_b_2022_09
+(
+  id BIGINT(20) PRIMARY KEY NOT NULL,
+  name VARCHAR(2),
+  exchange VARCHAR(10),
+  ask INT(11),
+  bid INT(11),
+  time DATETIME
+);
+DROP TABLE IF EXISTS db_sz.payment_a_2022_08;
+CREATE TABLE db_sz.payment_a_2022_08
+(
+  id BIGINT(20) PRIMARY KEY NOT NULL,
+  name VARCHAR(2),
+  exchange VARCHAR(10),
+  ask INT(11),
+  bid INT(11),
+  time DATETIME
+);
+DROP TABLE IF EXISTS db_sz.payment_a_2022_09;
+CREATE TABLE db_sz.payment_a_2022_09
+(
+  id BIGINT(20) PRIMARY KEY NOT NULL,
+  name VARCHAR(2),
+  exchange VARCHAR(10),
+  ask INT(11),
+  bid INT(11),
+  time DATETIME
+);
+DROP TABLE IF EXISTS db_sz.payment_b_2022_08;
+CREATE TABLE db_sz.payment_b_2022_08
+(
+  id BIGINT(20) PRIMARY KEY NOT NULL,
+  name VARCHAR(2),
+  exchange VARCHAR(10),
+  ask INT(11),
+  bid INT(11),
+  time DATETIME
+);
+DROP TABLE IF EXISTS db_sz.payment_b_2022_09;
+CREATE TABLE db_sz.payment_b_2022_09
 (
   id BIGINT(20) PRIMARY KEY NOT NULL,
   name VARCHAR(2),

@@ -1,8 +1,8 @@
 package com.spartajet.shardingboot;
 
 import com.dangdang.ddframe.rdb.sharding.id.generator.self.CommonSelfIdGenerator;
-import com.spartajet.shardingboot.bean.Tick;
-import com.spartajet.shardingboot.mapper.TickMapper;
+import com.spartajet.shardingboot.bean.Payment;
+import com.spartajet.shardingboot.mapper.PaymentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,38 +21,38 @@ import java.util.List;
 @Slf4j
 public class SpringbootShardingJdbcDemoApplicationTests {
     @Autowired
-    private TickMapper tickMapper;
+    private PaymentRepository paymentRepository;
     @Autowired
     private CommonSelfIdGenerator commonSelfIdGenerator;
 
 
     @Test
     public void insertTest() {
-        Tick tick = new Tick(commonSelfIdGenerator.generateId().longValue(), "a", "sh", 300, 100, getDate("2017-05-07"));
-        this.tickMapper.insertTick(tick);
+        Payment payment = new Payment(commonSelfIdGenerator.generateId().longValue(), "a", "sh", 300, 100, getDate("2022-08-15"));
+        this.paymentRepository.insertPayment(payment);
     }
 
     @Test
     public void selectAllTest() {
-        List<Tick> list = this.tickMapper.listTickAll();
+        List<Payment> list = this.paymentRepository.listAll();
         list.forEach(System.out::println);
     }
 
     @Test
     public void selectByConditionTest() {
-        List<Tick> list = this.tickMapper.listTickByCondition("a", "sh", getDate("2017-03-01"), getDate("2017-10-05"));
+        List<Payment> list = this.paymentRepository.listPaymentByCondition("a", "sh", getDate("2022-08-01"), getDate("2022-10-01"));
         list.forEach(System.out::println);
     }
 
     @Test
     public void selectForPageTest() {
-        List<Tick> list = this.tickMapper.listTickForPage("a", "sh", getDate("2017-01-01"), getDate("2017-10-30"), 1, 10);
+        List<Payment> list = this.paymentRepository.listPaymentForPage("a", "sh", getDate("2022-01-01"), getDate("2022-10-30"), 1, 10);
         list.forEach(System.out::println);
     }
 
     @Test
     public void testDate(){
-        System.out.println(getDate("2017-03-01"));
+        System.out.println(getDate("2022-08-15"));
     }
     private Date getDate(String dateStr) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

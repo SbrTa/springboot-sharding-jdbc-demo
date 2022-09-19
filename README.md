@@ -335,7 +335,7 @@ sharding-jdbc的原理其实很简单，就是自己做一个DataSource给上层
     @Primary
     public DataSource shardingDataSource(HashMap<String, DataSource> dataSourceMap, DatabaseShardingStrategy databaseShardingStrategy, TableShardingStrategy tableShardingStrategy) {
         DataSourceRule dataSourceRule = new DataSourceRule(dataSourceMap);
-        TableRule tableRule = TableRule.builder("tick").actualTables(Arrays.asList("db_sh.tick_a_2017_01", "db_sh.tick_a_2017_02", "db_sh.tick_b_2017_01", "db_sh.tick_b_2017_02", "db_sz.tick_a_2017_01", "db_sz.tick_a_2017_02", "db_sz.tick_b_2017_01", "db_sz.tick_a_2017_02")).dataSourceRule(dataSourceRule).build();
+        TableRule tableRule = TableRule.builder("payment").actualTables(Arrays.asList("db_sh.tick_a_2017_01", "db_sh.tick_a_2017_02", "db_sh.tick_b_2017_01", "db_sh.tick_b_2017_02", "db_sz.tick_a_2017_01", "db_sz.tick_a_2017_02", "db_sz.tick_b_2017_01", "db_sz.tick_a_2017_02")).dataSourceRule(dataSourceRule).build();
         ShardingRule shardingRule = ShardingRule.builder().dataSourceRule(dataSourceRule).tableRules(Arrays.asList(tableRule)).databaseShardingStrategy(databaseShardingStrategy).tableShardingStrategy(tableShardingStrategy).build();
         DataSource shardingDataSource = ShardingDataSourceFactory.createDataSource(shardingRule);
         return shardingDataSource;
@@ -362,8 +362,8 @@ public class Tick {
 ```java
 @Mapper
 public interface TickMapper {
-    @Insert("insert into tick (id,name,exchange,ask,bid,time) values (#{id},#{name},#{exchange},#{ask},#{bid},#{time})")
-    void insertTick(Tick tick);
+    @Insert("insert into payment (id,name,exchange,ask,bid,time) values (#{id},#{name},#{exchange},#{ask},#{bid},#{time})")
+    void insertTick(Tick payment);
 }
 ```
 ### 7.3 SessionFactory配置
@@ -404,8 +404,8 @@ public class SpringbootShardingJdbcDemoApplicationTests {
     
     @Test
     public void contextLoads() {
-        Tick tick = new Tick(commonSelfIdGenerator.generateId().longValue(), "a", "sh", 100, 200, new Date());
-        this.tickMapper.insertTick(tick);
+        Tick payment = new Tick(commonSelfIdGenerator.generateId().longValue(), "a", "sh", 100, 200, new Date());
+        this.tickMapper.insertTick(payment);
     }
 
 }
