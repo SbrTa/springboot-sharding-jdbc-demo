@@ -120,8 +120,8 @@ public class DataSourceConfig {
     public DataSource shardingDataSource(HashMap<String, DataSource> dataSourceMap, DatabaseShardingStrategy databaseShardingStrategy, TableShardingStrategy tableShardingStrategy) {
         DataSourceRule dataSourceRule = new DataSourceRule(dataSourceMap);
         TableRule tableRule = TableRule.builder("payment").actualTables(Arrays.asList(
-                "db_sh.payment_a_2022_08", "db_sh.payment_a_2022_09", "db_sh.payment_b_2022_08", "db_sh.payment_b_2022_09",
-                "db_sz.payment_a_2022_08", "db_sz.payment_a_2022_09", "db_sz.payment_b_2022_08", "db_sz.payment_b_2022_09")).dataSourceRule(dataSourceRule).build();
+                "db_sh.payment_bdt_2022_08", "db_sh.payment_bdt_2022_09", "db_sh.payment_usd_2022_08", "db_sh.payment_usd_2022_09",
+                "db_sz.payment_bdt_2022_08", "db_sz.payment_bdt_2022_09", "db_sz.payment_usd_2022_08", "db_sz.payment_usd_2022_09")).dataSourceRule(dataSourceRule).build();
         ShardingRule shardingRule = ShardingRule.builder().dataSourceRule(dataSourceRule).tableRules(Arrays.asList(tableRule)).databaseShardingStrategy(databaseShardingStrategy).tableShardingStrategy(tableShardingStrategy).build();
         DataSource shardingDataSource = ShardingDataSourceFactory.createDataSource(shardingRule);
         return shardingDataSource;

@@ -11,7 +11,7 @@ import java.sql.Date;
 @AllArgsConstructor
 public class Payment {
     private long id;
-    private String name;
+    private String currency;
     private String exchange;
     private int ask;
     private int bid;

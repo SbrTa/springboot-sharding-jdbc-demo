@@ -9,14 +9,14 @@ import java.sql.Date;
 public class PaymentProvider {
 
 
-    private final static String LIST_SQL ="select t.id , t.`name` , t.exchange , t.ask , t.bid , t.time from payment as t where 1=1 ";
+    private final static String LIST_SQL ="select t.id , t.`currency` , t.exchange , t.ask , t.bid , t.time from payment as t where 1=1 ";
 
-    public String listPaymentByCondition(@Param(value = "name")String name , @Param(value = "exchange") String exchange , @Param(value = "startDate") Date startDate, @Param(value = "endDate")Date endDate){
+    public String listPaymentByCondition(@Param(value = "currency")String currency , @Param(value = "exchange") String exchange , @Param(value = "startDate") Date startDate, @Param(value = "endDate")Date endDate){
         StringBuilder sb = new StringBuilder(LIST_SQL);
 
 
-        if(!StringUtils.isEmpty(name)){
-            sb.append(" and t.name = #{name} ");
+        if(!StringUtils.isEmpty(currency)){
+            sb.append(" and t.currency = #{currency} ");
         }
         if(!StringUtils.isEmpty(exchange)){
             sb.append(" and t.exchange = #{exchange} ");
@@ -30,9 +30,9 @@ public class PaymentProvider {
     }
 
 
-    public String listPaymentForPage(@Param(value = "name")String name , @Param(value = "exchange") String exchange , @Param(value = "startDate") Date startDate, @Param(value = "endDate")Date endDate, @Param(value = "startPage") Integer startPage, @Param(value = "pageSize") Integer pageSize){
+    public String listPaymentForPage(@Param(value = "currency")String currency , @Param(value = "exchange") String exchange , @Param(value = "startDate") Date startDate, @Param(value = "endDate")Date endDate, @Param(value = "startPage") Integer startPage, @Param(value = "pageSize") Integer pageSize){
 
-        String sql = listPaymentByCondition(name,exchange,startDate,endDate);
+        String sql = listPaymentByCondition(currency,exchange,startDate,endDate);
 
         StringBuilder sb = new StringBuilder(sql);
         sb.append(" order by id ");

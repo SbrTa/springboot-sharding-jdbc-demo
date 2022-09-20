@@ -20,9 +20,9 @@ public class ShardingUtils {
 
         Set valueSet = new HashSet<Object>();
 
-        if("name".equals(shardingKey)){
-            valueSet.add("a");
-            valueSet.add("b");
+        if("currency".equals(shardingKey)){
+            valueSet.add("bdt");
+            valueSet.add("usd");
         }else if("time".equals(shardingKey)){
             valueSet.add(LocalDate.of(2022,8,1));
             valueSet.add(LocalDate.of(2022,9,1));

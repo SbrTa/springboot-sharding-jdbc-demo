@@ -28,7 +28,7 @@ public class SpringbootShardingJdbcDemoApplicationTests {
 
     @Test
     public void insertTest() {
-        Payment payment = new Payment(commonSelfIdGenerator.generateId().longValue(), "a", "sh", 300, 100, getDate("2022-08-15"));
+        Payment payment = new Payment(commonSelfIdGenerator.generateId().longValue(), "usd", "sh", 300, 100, getDate("2022-09-11"));
         this.paymentRepository.insertPayment(payment);
     }
 
@@ -40,13 +40,13 @@ public class SpringbootShardingJdbcDemoApplicationTests {
 
     @Test
     public void selectByConditionTest() {
-        List<Payment> list = this.paymentRepository.listPaymentByCondition("a", "sh", getDate("2022-08-01"), getDate("2022-10-01"));
+        List<Payment> list = this.paymentRepository.listPaymentByCondition("usd", "sz", getDate("2022-08-01"), getDate("2022-10-01"));
         list.forEach(System.out::println);
     }
 
     @Test
     public void selectForPageTest() {
-        List<Payment> list = this.paymentRepository.listPaymentForPage("a", "sh", getDate("2022-01-01"), getDate("2022-10-30"), 1, 10);
+        List<Payment> list = this.paymentRepository.listPaymentForPage("bdt", "sh", getDate("2022-01-01"), getDate("2022-10-30"), 1, 10);
         list.forEach(System.out::println);
     }
 

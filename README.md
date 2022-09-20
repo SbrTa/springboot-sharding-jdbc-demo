@@ -10,17 +10,17 @@
 我的项目背景就不说了，现在举一个例子吧：A,B两支股票都在上海，深圳上市，需要实时记录这两支股票的交易tick(不懂tick也没有关系)。现在的分片策略是：上海、深圳分别建库，每个库都存各自交易所的两支股票的ticktick，且按照月分表。如图：
 
 * db_sh
-	* tick_a_2017_01
-	* tick_b_2017_01
+	* tick_bdt_2017_01
+	* tick_usd_2017_01
 	* ........
-	* tick_a_2017_12
-	* tick_b_2017_12
+	* tick_bdt_2017_12
+	* tick_usd_2017_12
 * db_sz
-  * tick_a_2017_01
-	* tick_b_2017_01
+  * tick_bdt_2017_01
+	* tick_usd_2017_01
 	* ........
-	* tick_a_2017_12
-	* tick_b_2017_12
+	* tick_bdt_2017_12
+	* tick_usd_2017_12
 
 	分库分表就是这样的。根据这个建库。
 	
@@ -277,21 +277,21 @@ public class TableShardingAlgorithm implements MultipleKeysTableShardingAlgorith
      */
     @Override
     public Collection<String> doSharding(Collection<String> availableTargetNames, Collection<ShardingValue<?>> shardingValues) {
-        String name = null;
+        String currency = null;
         Date time = null;
         for (ShardingValue<?> shardingValue : shardingValues) {
-            if (shardingValue.getColumnName().equals("name")) {
-                name = ((ShardingValue<String>) shardingValue).getValue();
+            if (shardingValue.getColumnName().equals("currency")) {
+				currency = ((ShardingValue<String>) shardingValue).getValue();
             }
             if (shardingValue.getColumnName().equals("time")) {
                 time = ((ShardingValue<Date>) shardingValue).getValue();
             }
-            if (name != null && time != null) {
+            if (currency != null && time != null) {
                 break;
             }
         }
         String timeString = new SimpleDateFormat("yyyy_MM").format(time);
-        String suffix = name + "_" + timeString;
+        String suffix = currency + "_" + timeString;
         Collection<String> result = new LinkedHashSet<>();
         for (String targetName : availableTargetNames) {
             if (targetName.endsWith(suffix)) {
@@ -318,7 +318,7 @@ public class ShardingStrategyConfig {
     @Bean
     public TableShardingStrategy tableShardingStrategy(TableShardingAlgorithm tableShardingAlgorithm) {
         Collection<String> columns = new LinkedList<>();
-        columns.add("name");
+        columns.add("currency");
         columns.add("time");
         TableShardingStrategy tableShardingStrategy = new TableShardingStrategy(columns, tableShardingAlgorithm);
         return tableShardingStrategy;
@@ -335,7 +335,7 @@ sharding-jdbc的原理其实很简单，就是自己做一个DataSource给上层
     @Primary
     public DataSource shardingDataSource(HashMap<String, DataSource> dataSourceMap, DatabaseShardingStrategy databaseShardingStrategy, TableShardingStrategy tableShardingStrategy) {
         DataSourceRule dataSourceRule = new DataSourceRule(dataSourceMap);
-        TableRule tableRule = TableRule.builder("payment").actualTables(Arrays.asList("db_sh.tick_a_2017_01", "db_sh.tick_a_2017_02", "db_sh.tick_b_2017_01", "db_sh.tick_b_2017_02", "db_sz.tick_a_2017_01", "db_sz.tick_a_2017_02", "db_sz.tick_b_2017_01", "db_sz.tick_a_2017_02")).dataSourceRule(dataSourceRule).build();
+        TableRule tableRule = TableRule.builder("payment").actualTables(Arrays.asList("db_sh.tick_bdt_2017_01", "db_sh.tick_bdt_2017_02", "db_sh.tick_usd_2017_01", "db_sh.tick_usd_2017_02", "db_sz.tick_bdt_2017_01", "db_sz.tick_bdt_2017_02", "db_sz.tick_usd_2017_01", "db_sz.tick_bdt_2017_02")).dataSourceRule(dataSourceRule).build();
         ShardingRule shardingRule = ShardingRule.builder().dataSourceRule(dataSourceRule).tableRules(Arrays.asList(tableRule)).databaseShardingStrategy(databaseShardingStrategy).tableShardingStrategy(tableShardingStrategy).build();
         DataSource shardingDataSource = ShardingDataSourceFactory.createDataSource(shardingRule);
         return shardingDataSource;
@@ -349,7 +349,7 @@ sharding-jdbc的原理其实很简单，就是自己做一个DataSource给上层
 ```java
 public class Tick {
     private long id;
-    private String name;
+    private String currency;
     private String exchange;
     private int ask;
     private int bid;
@@ -362,7 +362,7 @@ public class Tick {
 ```java
 @Mapper
 public interface TickMapper {
-    @Insert("insert into payment (id,name,exchange,ask,bid,time) values (#{id},#{name},#{exchange},#{ask},#{bid},#{time})")
+    @Insert("insert into payment (id,currency,exchange,ask,bid,time) values (#{id},#{currency},#{exchange},#{ask},#{bid},#{time})")
     void insertTick(Tick payment);
 }
 ```
@@ -404,7 +404,7 @@ public class SpringbootShardingJdbcDemoApplicationTests {
     
     @Test
     public void contextLoads() {
-        Tick payment = new Tick(commonSelfIdGenerator.generateId().longValue(), "a", "sh", 100, 200, new Date());
+        Tick payment = new Tick(commonSelfIdGenerator.generateId().longValue(), "bdt", "sh", 100, 200, new Date());
         this.tickMapper.insertTick(payment);
     }
 

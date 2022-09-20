@@ -53,7 +53,7 @@ public class TableShardingAlgorithm implements MultipleKeysTableShardingAlgorith
 
         Collection<String> result = new LinkedHashSet<>();
 
-        Set<Object> nameValueSet = getShardingValue(shardingValues,"name");
+        Set<Object> nameValueSet = getShardingValue(shardingValues,"currency");
         Set<Object> timeValueSet = getShardingValue(shardingValues,"time");
 
         //计算两个集合的笛卡尔积

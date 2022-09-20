@@ -26,7 +26,7 @@ public class ShardingStrategyConfig {
     @Bean
     public TableShardingStrategy tableShardingStrategy(TableShardingAlgorithm tableShardingAlgorithm) {
         Collection<String> columns = new LinkedList<>();
-        columns.add("name");
+        columns.add("currency");
         columns.add("time");
         TableShardingStrategy tableShardingStrategy = new TableShardingStrategy(columns, tableShardingAlgorithm);
         return tableShardingStrategy;
