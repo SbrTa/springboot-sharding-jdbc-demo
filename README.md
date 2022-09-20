@@ -351,8 +351,8 @@ public class Tick {
     private long id;
     private String currency;
     private String region;
-    private int ask;
-    private int bid;
+    private int amount;
+    private int product;
     private Date time;
 }
 ```
@@ -362,7 +362,7 @@ public class Tick {
 ```java
 @Mapper
 public interface TickMapper {
-    @Insert("insert into payment (id,currency,region,ask,bid,time) values (#{id},#{currency},#{region},#{ask},#{bid},#{time})")
+    @Insert("insert into payment (id,currency,region,amount,product,time) values (#{id},#{currency},#{region},#{amount},#{product},#{time})")
     void insertTick(Tick payment);
 }
 ```

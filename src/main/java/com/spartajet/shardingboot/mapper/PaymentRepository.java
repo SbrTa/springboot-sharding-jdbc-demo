@@ -14,14 +14,14 @@ import java.util.List;
 @Mapper
 public interface PaymentRepository {
 
-    @Insert("insert into payment (id,currency,region,ask,bid,time) values (#{id},#{currency},#{region},#{ask},#{bid},#{time})")
+    @Insert("insert into payment (id,currency,region,amount,product,time) values (#{id},#{currency},#{region},#{amount},#{product},#{time})")
     void insertPayment(Payment payment);
 
 
     @SelectProvider(type = PaymentProvider.class , method = "listPaymentByCondition")
     List<Payment> listPaymentByCondition(@Param(value = "currency")String currency , @Param(value = "region") String region , @Param(value = "startDate") Date startDate, @Param(value = "endDate")Date endDate);
 
-    @Select("select t.id , t.`currency` , t.region , t.ask , t.bid , t.time from payment as t")
+    @Select("select t.id , t.`currency` , t.region , t.amount , t.product , t.time from payment as t")
     List<Payment> listAll();
 
     @SelectProvider(type = PaymentProvider.class , method = "listPaymentForPage")

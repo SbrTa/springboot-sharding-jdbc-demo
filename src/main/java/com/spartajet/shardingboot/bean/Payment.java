@@ -13,7 +13,7 @@ public class Payment {
     private long id;
     private String currency;
     private String region;
-    private int ask;
-    private int bid;
+    private double amount;
+    private int product;
     private Date time;
 }
