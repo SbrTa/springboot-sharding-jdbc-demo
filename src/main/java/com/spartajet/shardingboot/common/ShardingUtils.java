@@ -26,9 +26,9 @@ public class ShardingUtils {
         }else if("time".equals(shardingKey)){
             valueSet.add(LocalDate.of(2022,8,1));
             valueSet.add(LocalDate.of(2022,9,1));
-        }else if("exchange".equals(shardingKey)){
-            valueSet.add("sh");
-            valueSet.add("sz");
+        }else if("region".equals(shardingKey)){
+            valueSet.add("bd");
+            valueSet.add("us");
         }
         return valueSet;
     }

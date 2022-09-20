@@ -19,7 +19,7 @@ import java.util.LinkedList;
 public class ShardingStrategyConfig {
     @Bean
     public DatabaseShardingStrategy databaseShardingStrategy(DatabaseShardingAlgorithm databaseShardingAlgorithm) {
-        DatabaseShardingStrategy databaseShardingStrategy = new DatabaseShardingStrategy("exchange", databaseShardingAlgorithm);
+        DatabaseShardingStrategy databaseShardingStrategy = new DatabaseShardingStrategy("region", databaseShardingAlgorithm);
         return databaseShardingStrategy;
     }
 

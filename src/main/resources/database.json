@@ -1,14 +1,14 @@
 [
   {
-    "name": "db_sh",
-    "url": "jdbc:mysql://localhost:3306/db_sh",
+    "name": "db_bd",
+    "url": "jdbc:mysql://localhost:3306/db_bd",
     "username": "root",
     "password": "",
     "driveClassName":"com.mysql.jdbc.Driver"
   },
   {
-    "name": "db_sz",
-    "url": "jdbc:mysql://localhost:3306/db_sz",
+    "name": "db_us",
+    "url": "jdbc:mysql://localhost:3306/db_us",
     "username": "root",
     "password": "",
     "driveClassName":"com.mysql.jdbc.Driver"

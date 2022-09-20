@@ -9,13 +9,13 @@
 ## 一、需求背景
 我的项目背景就不说了，现在举一个例子吧：A,B两支股票都在上海，深圳上市，需要实时记录这两支股票的交易tick(不懂tick也没有关系)。现在的分片策略是：上海、深圳分别建库，每个库都存各自交易所的两支股票的ticktick，且按照月分表。如图：
 
-* db_sh
+* db_bd
 	* tick_bdt_2017_01
 	* tick_usd_2017_01
 	* ........
 	* tick_bdt_2017_12
 	* tick_usd_2017_12
-* db_sz
+* db_us
   * tick_bdt_2017_01
 	* tick_usd_2017_01
 	* ........
@@ -182,15 +182,15 @@ mvn配置pom如下：
 ```json
 [
   {
-    "name": "db_sh",
-    "url": "jdbc:mysql://localhost:3306/db_sh",
+    "name": "db_bd",
+    "url": "jdbc:mysql://localhost:3306/db_bd",
     "username": "root",
     "password": "root",
     "driveClassName":"com.mysql.jdbc.Driver"
   },
   {
-    "name": "db_sz",
-    "url": "jdbc:mysql://localhost:3306/db_sz",
+    "name": "db_us",
+    "url": "jdbc:mysql://localhost:3306/db_us",
     "username": "root",
     "password": "root",
     "driveClassName":"com.mysql.jdbc.Driver"
@@ -311,7 +311,7 @@ public class TableShardingAlgorithm implements MultipleKeysTableShardingAlgorith
 public class ShardingStrategyConfig {
     @Bean
     public DatabaseShardingStrategy databaseShardingStrategy(DatabaseShardingAlgorithm databaseShardingAlgorithm) {
-        DatabaseShardingStrategy databaseShardingStrategy = new DatabaseShardingStrategy("exchange", databaseShardingAlgorithm);
+        DatabaseShardingStrategy databaseShardingStrategy = new DatabaseShardingStrategy("region", databaseShardingAlgorithm);
         return databaseShardingStrategy;
     }
 
@@ -335,7 +335,7 @@ sharding-jdbc的原理其实很简单，就是自己做一个DataSource给上层
     @Primary
     public DataSource shardingDataSource(HashMap<String, DataSource> dataSourceMap, DatabaseShardingStrategy databaseShardingStrategy, TableShardingStrategy tableShardingStrategy) {
         DataSourceRule dataSourceRule = new DataSourceRule(dataSourceMap);
-        TableRule tableRule = TableRule.builder("payment").actualTables(Arrays.asList("db_sh.tick_bdt_2017_01", "db_sh.tick_bdt_2017_02", "db_sh.tick_usd_2017_01", "db_sh.tick_usd_2017_02", "db_sz.tick_bdt_2017_01", "db_sz.tick_bdt_2017_02", "db_sz.tick_usd_2017_01", "db_sz.tick_bdt_2017_02")).dataSourceRule(dataSourceRule).build();
+        TableRule tableRule = TableRule.builder("payment").actualTables(Arrays.asList("db_bd.tick_bdt_2017_01", "db_bd.tick_bdt_2017_02", "db_bd.tick_usd_2017_01", "db_bd.tick_usd_2017_02", "db_us.tick_bdt_2017_01", "db_us.tick_bdt_2017_02", "db_us.tick_usd_2017_01", "db_us.tick_bdt_2017_02")).dataSourceRule(dataSourceRule).build();
         ShardingRule shardingRule = ShardingRule.builder().dataSourceRule(dataSourceRule).tableRules(Arrays.asList(tableRule)).databaseShardingStrategy(databaseShardingStrategy).tableShardingStrategy(tableShardingStrategy).build();
         DataSource shardingDataSource = ShardingDataSourceFactory.createDataSource(shardingRule);
         return shardingDataSource;
@@ -350,7 +350,7 @@ sharding-jdbc的原理其实很简单，就是自己做一个DataSource给上层
 public class Tick {
     private long id;
     private String currency;
-    private String exchange;
+    private String region;
     private int ask;
     private int bid;
     private Date time;
@@ -362,7 +362,7 @@ public class Tick {
 ```java
 @Mapper
 public interface TickMapper {
-    @Insert("insert into payment (id,currency,exchange,ask,bid,time) values (#{id},#{currency},#{exchange},#{ask},#{bid},#{time})")
+    @Insert("insert into payment (id,currency,region,ask,bid,time) values (#{id},#{currency},#{region},#{ask},#{bid},#{time})")
     void insertTick(Tick payment);
 }
 ```
@@ -404,7 +404,7 @@ public class SpringbootShardingJdbcDemoApplicationTests {
     
     @Test
     public void contextLoads() {
-        Tick payment = new Tick(commonSelfIdGenerator.generateId().longValue(), "bdt", "sh", 100, 200, new Date());
+        Tick payment = new Tick(commonSelfIdGenerator.generateId().longValue(), "bdt", "bd", 100, 200, new Date());
         this.tickMapper.insertTick(payment);
     }
 

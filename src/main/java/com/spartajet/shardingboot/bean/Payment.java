@@ -12,7 +12,7 @@ import java.sql.Date;
 public class Payment {
     private long id;
     private String currency;
-    private String exchange;
+    private String region;
     private int ask;
     private int bid;
     private Date time;

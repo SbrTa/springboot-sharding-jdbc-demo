@@ -79,10 +79,10 @@ public class DataSourceConfig {
      *
      * @return
      */
-    @Bean(name = "dataSource_sh")
-    @Qualifier(value = "dataSource_sh")
-    @ConfigurationProperties(prefix = "spring.datasource_sh")
-    public DataSource datasource_sh() {
+    @Bean(name = "dataSource_bd")
+    @Qualifier(value = "dataSource_bd")
+    @ConfigurationProperties(prefix = "spring.datasource_bd")
+    public DataSource datasource_bd() {
         return DataSourceBuilder.create().type(com.alibaba.druid.pool.DruidDataSource.class).build();
     }
 
@@ -91,26 +91,26 @@ public class DataSourceConfig {
      *
      * @return
      */
-    @Bean(name = "dataSource_sz")
-    @Qualifier(value = "dataSource_sz")
-    @ConfigurationProperties(prefix = "spring.datasource_sz")
-    public DataSource datasource_sz() {
+    @Bean(name = "dataSource_us")
+    @Qualifier(value = "dataSource_us")
+    @ConfigurationProperties(prefix = "spring.datasource_us")
+    public DataSource datasource_us() {
         return DataSourceBuilder.create().type(com.alibaba.druid.pool.DruidDataSource.class).build();
     }
 
     /**
      * 必须指定不同数据源对应的Bean的Qualifier 名称
      *
-     * @param dataSource_sh
-     * @param dataSource_sz
+     * @param dataSource_bd
+     * @param dataSource_us
      * @return
      */
     @Bean
     @Autowired
-    public HashMap<String, DataSource> dataSourceMap(@Qualifier(value = "dataSource_sh") DataSource dataSource_sh ,@Qualifier(value = "dataSource_sz")DataSource dataSource_sz) {
+    public HashMap<String, DataSource> dataSourceMap(@Qualifier(value = "dataSource_bd") DataSource dataSource_bd ,@Qualifier(value = "dataSource_us")DataSource dataSource_us) {
         HashMap<String, DataSource> dataSourceMap = new HashMap<>();
-        dataSourceMap.put("db_sh",dataSource_sh);
-        dataSourceMap.put("db_sz",dataSource_sz);
+        dataSourceMap.put("db_bd",dataSource_bd);
+        dataSourceMap.put("db_us",dataSource_us);
         return dataSourceMap;
     }
 
@@ -120,8 +120,8 @@ public class DataSourceConfig {
     public DataSource shardingDataSource(HashMap<String, DataSource> dataSourceMap, DatabaseShardingStrategy databaseShardingStrategy, TableShardingStrategy tableShardingStrategy) {
         DataSourceRule dataSourceRule = new DataSourceRule(dataSourceMap);
         TableRule tableRule = TableRule.builder("payment").actualTables(Arrays.asList(
-                "db_sh.payment_bdt_2022_08", "db_sh.payment_bdt_2022_09", "db_sh.payment_usd_2022_08", "db_sh.payment_usd_2022_09",
-                "db_sz.payment_bdt_2022_08", "db_sz.payment_bdt_2022_09", "db_sz.payment_usd_2022_08", "db_sz.payment_usd_2022_09")).dataSourceRule(dataSourceRule).build();
+                "db_bd.payment_bdt_2022_08", "db_bd.payment_bdt_2022_09", "db_bd.payment_usd_2022_08", "db_bd.payment_usd_2022_09",
+                "db_us.payment_bdt_2022_08", "db_us.payment_bdt_2022_09", "db_us.payment_usd_2022_08", "db_us.payment_usd_2022_09")).dataSourceRule(dataSourceRule).build();
         ShardingRule shardingRule = ShardingRule.builder().dataSourceRule(dataSourceRule).tableRules(Arrays.asList(tableRule)).databaseShardingStrategy(databaseShardingStrategy).tableShardingStrategy(tableShardingStrategy).build();
         DataSource shardingDataSource = ShardingDataSourceFactory.createDataSource(shardingRule);
         return shardingDataSource;

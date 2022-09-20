@@ -14,18 +14,18 @@ import java.util.List;
 @Mapper
 public interface PaymentRepository {
 
-    @Insert("insert into payment (id,currency,exchange,ask,bid,time) values (#{id},#{currency},#{exchange},#{ask},#{bid},#{time})")
+    @Insert("insert into payment (id,currency,region,ask,bid,time) values (#{id},#{currency},#{region},#{ask},#{bid},#{time})")
     void insertPayment(Payment payment);
 
 
     @SelectProvider(type = PaymentProvider.class , method = "listPaymentByCondition")
-    List<Payment> listPaymentByCondition(@Param(value = "currency")String currency , @Param(value = "exchange") String exchange , @Param(value = "startDate") Date startDate, @Param(value = "endDate")Date endDate);
+    List<Payment> listPaymentByCondition(@Param(value = "currency")String currency , @Param(value = "region") String region , @Param(value = "startDate") Date startDate, @Param(value = "endDate")Date endDate);
 
-    @Select("select t.id , t.`currency` , t.exchange , t.ask , t.bid , t.time from payment as t")
+    @Select("select t.id , t.`currency` , t.region , t.ask , t.bid , t.time from payment as t")
     List<Payment> listAll();
 
     @SelectProvider(type = PaymentProvider.class , method = "listPaymentForPage")
-    List<Payment> listPaymentForPage(@Param(value = "currency")String currency , @Param(value = "exchange") String exchange , @Param(value = "startDate") Date startDate, @Param(value = "endDate") Date endDate, @Param(value = "startPage") Integer startPage, @Param(value = "pageSize") Integer pageSize);
+    List<Payment> listPaymentForPage(@Param(value = "currency")String currency , @Param(value = "region") String region , @Param(value = "startDate") Date startDate, @Param(value = "endDate") Date endDate, @Param(value = "startPage") Integer startPage, @Param(value = "pageSize") Integer pageSize);
 
 
 
