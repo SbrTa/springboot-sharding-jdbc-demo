@@ -1,15 +1,15 @@
-> I encountered the problem of sub-database and sub-table in the project, and found shrding-jdbc, so I started an incremental 
-> sharding application of springboot+sharding-jdbc+mybatis. Write a blog today to summarize the pits encountered.
+> I encountered the problem of sub-database and sub-table in a project, and found sharding-jdbc, so I started an incremental 
+> sharding application of springboot+sharding-jdbc+mybatis. 
 > 
 > In fact, I wrote an increase-jdbc component myself. When I read the source code of sharding-jdbc, I found that the ideas and principles are similar, 
-> and sharding is better than mine in all aspects. After all, I was driven out in one day. East.
+> and sharding is better than mine in all aspects. After all, I was driven out in one day.
 > 
 > 
 > The demo does not write logs, nor does it have any abnormal judgment, just to illustrate the problem
 
 ## 1. Background
-I won't go into the background of the project, but let's take an example now: the service is available in Bangladesh and USA, you have option 
-to make payment in BDT or USD. The current sharding strategy is as follows: Bangladesh and USA build separate database, and each stores 
+I won't go into the background of the project, but let's take an example: the service is available in Bangladesh and USA, you have option 
+to make payment in BDT or USD. The current sharding strategy is as follows: region Bangladesh and USA has separate database, and each stores 
 payments for BDT and USD currency and divides them according to the monthly schedule. As shown below:
 * db_bd
 	* payment_bdt_2022_01
@@ -249,8 +249,9 @@ The maven configuration pom is as follows:
 	</build>
 </project>
 ```
-In fact, this is similar to the official website of sharding-jdbc. In fact, I want to write a pom of `sharding-jdbc-spring-boot-starter`, and I will talk about it when the project business is finished.
-## 4. Configure the data source
+In fact, this is similar to the official website of sharding-jdbc.
+
+## 4. Configure data source
 I want to make the database configurable, so instead of configuring the database directly in the `application.properties` file, I write it in the `database.json` file.
 
 ```json
@@ -273,7 +274,7 @@ I want to make the database configurable, so instead of configuring the database
 ```
 Then read the database file in springboot, and the loading method is as follows:
 ```java
-@Value("classpath:database.json")
+    @Value("classpath:database.json")
     private Resource databaseFile;
 
     @Bean
@@ -302,10 +303,11 @@ After loading the database information, you can configure the logical database t
     }
 ```
 In this way, each logical database is loaded.
-## 5. Configure the sharding strategy
+
+## 5. Configure sharding strategy
 
 ### 5.1 Database sharding strategy
-In this example, the sub-database of the database is divided according to Bangladesh (bd) and USA (us), and in sharding-jdbc, 
+In this example, the sub-database of the database is divided according to region - Bangladesh (bd) and USA (us), and in sharding-jdbc, 
 it is a single-key sharding. You can implement the interface `Single Key Database Sharding Algorithm` according to the official documentation
 
 ```java
@@ -335,8 +337,9 @@ public class DatabaseShardingAlgorithm implements SingleKeyDatabaseShardingAlgor
 ```
 There are two other methods in this interface, `do In Sharding` and `do Between Sharding`, because I don't use the IN and BETWEEN methods 
 for the time being, so I didn't write them, and returned null directly.
+
 ### 5.2 Data table fragmentation strategy
-The sharding strategy of the data table is jointly determined according to the stock and time. In sharding-jdbc, it is multi-key sharding. 
+The sharding strategy of the data table is jointly determined according to the currency and time. In sharding-jdbc, it is multi-key sharding. 
 According to the official documentation, it is OK to implement the `Multiple Keys Table Sharding Algorithm` interface
 
 ```java
@@ -413,8 +416,8 @@ public class ShardingStrategyConfig {
 }
 ```
 In this way, a completed sharding strategy can be formed
-## 6. Configure the Data Source of Sharding-jdbc
 
+## 6. Configure the Data Source of Sharding-jdbc
 The principle of sharding-jdbc is actually very simple. It is to create a Data Source for the upper-layer application to use. 
 This Data Source contains all the logical libraries and logical tables. When adding, deleting, modifying and checking the application, 
 he will modify the SQL by himself, and then select the appropriate database to continue. operate. So this Data Source creation is very important
@@ -432,7 +435,7 @@ he will modify the SQL by himself, and then select the appropriate database to c
 Here I want to focus on why the @Primary annotation is used. Without this annotation, an error will be reported. The general meaning 
 of the error is that there are too many Data Sources, and mybatis does not know which one to use. Add this mybatis to know the Data Source of sharding. 
 The reference here is the multi-data source configuration of jpa
-## 7. configure mybatis
+## 7. Configure mybatis
 ### 7.1 Bean
 
 ```java
@@ -455,7 +458,7 @@ public interface PaymentMapper {
 }
 ```
 ### 7.3 Session Factory configuration
-Also set up payment's Session Factory:
+Also set up Session Factory:
 ```
 @Configuration
 @MapperScan(basePackages = "com.spartajet.shardingboot.mapper", sqlSessionFactoryRef = "sessionFactory")
@@ -478,7 +481,7 @@ public class SessionFactoryConfig {
 A `Common Self Id Generator` is added here, the id generator that comes with sharding, and the code is similar to `facebook`'s `snowflake`. 
 I don't want to set the primary key of the database to be self-incrementing, otherwise the two-way synchronization of the data will die miserably.
 ### 
-## 8. test write
+## 8. Test
 
 ```
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -497,7 +500,4 @@ public class SpringbootShardingJdbcDemoApplicationTests {
     }
 }
 ```
-Successfully implemented incremental database and table division！！！
-
-
-
+Successfully implemented incremental database and table division.......
