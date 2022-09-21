@@ -9,28 +9,22 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
-/**
- * 单分片键算法 ，需要实现接口中的三个方法
- *
- * @create 2017-02-07 下午9:15
- * @email gxz04220427@163.com
- */
 @Slf4j
 @Service
 public class DatabaseShardingAlgorithm implements SingleKeyDatabaseShardingAlgorithm<String> {
     /**
-     * 根据分片值和SQL的=运算符计算分片结果名称集合.<br/>
-     *  <p>doEqualSharding在WHERE使用=作为条件分片键。算法中使用shardingValue.getValue()获取等=后的值</p>
+     * Calculate shard result name set based on shard value and SQL's = operator.<br/>
+     *  <p>do Equal Sharding uses = as a conditional sharding key in WHERE. Use sharding Value.get Value() in the algorithm to get the value after equal =</p>
      *
-     * @param availableTargetNames 所有的可用目标名称集合, 一般是数据源或表名称
-     * @param shardingValue        分片值
+     * @param availableTargetNames A collection of all available target names, typically data source or table names
+     * @param shardingValue        Sharding value
      *
-     * @return 分片后指向的目标名称, 一般是数据源或表名称
+     * @return The target name pointed to after sharding, usually the name of the data source or table
      */
     @Override
     public String doEqualSharding(Collection<String> availableTargetNames, ShardingValue<String> shardingValue) {
 
-        log.info("[数据库策略] 当前SQL语句为：=条件语句， 分片建的值为：{}", new GsonBuilder().create().toJson(shardingValue));
+        log.info("[Database Policy] The current SQL statement is: = conditional statement, and the value of the shard build is: {}", new GsonBuilder().create().toJson(shardingValue));
 
         String databaseName = "";
         for (String targetName : availableTargetNames) {
@@ -39,25 +33,25 @@ public class DatabaseShardingAlgorithm implements SingleKeyDatabaseShardingAlgor
                 break;
             }
         }
-        log.info("[数据库策略] 当前SQL语句为：=条件语句， 目标数据库为：{}",databaseName);
+        log.info("[Database Policy] The current SQL statement is: = conditional statement, and the target database is: {}",databaseName);
 
         return databaseName;
     }
 
     /**
-     * 根据分片值和SQL的IN运算符计算分片结果名称集合.<br/>
+     * Calculate shard result name set based on shard value and SQL's IN operator.<br/>
      *
-     * <p>doInSharding在WHERE使用IN作为条件分片键。算法中使用shardingValue.getValues()获取IN后的值</p>
+     * <p>do In Sharding uses IN as the conditional sharding key in WHERE. Use sharding Value.get Values() in the algorithm to get the value after IN</p>
      *
-     * @param availableTargetNames 所有的可用目标名称集合, 一般是数据源或表名称
-     * @param shardingValue        分片值
+     * @param availableTargetNames A collection of all available target names, typically data source or table names
+     * @param shardingValue        Sharding value
      *
-     * @return 分片后指向的目标名称集合, 一般是数据源或表名称
+     * @return The set of target names pointed to after sharding, usually the data source or table name
      */
     @Override
     public Collection<String> doInSharding(Collection<String> availableTargetNames, ShardingValue<String> shardingValue) {
 
-        log.info("[数据库策略] 当前SQL语句为：in 条件语句，通过IN 条件分片键的值获取目标数据库集合； 分片建的值为：{}", new GsonBuilder().create().toJson(shardingValue));
+        log.info("[Database strategy] The current SQL statement is: in conditional statement, and the target database set is obtained through the value of the IN conditional sharding key; the value of sharding is: {}", new GsonBuilder().create().toJson(shardingValue));
 
         Collection<String> result = new LinkedHashSet<>(availableTargetNames.size());
         for (String value : shardingValue.getValues()) {
@@ -67,23 +61,23 @@ public class DatabaseShardingAlgorithm implements SingleKeyDatabaseShardingAlgor
                 }
             }
         }
-        log.info("[数据库策略] 当前SQL语句的目标数据库集合为：{}",new GsonBuilder().create().toJson(result));
+        log.info("[Database Policy] The target database set of the current SQL statement is: {}",new GsonBuilder().create().toJson(result));
         return result;
     }
 
     /**
-     * 根据分片值和SQL的BETWEEN运算符计算分片结果名称集合.<br/>
-     * <p>doBetweenSharding在WHERE使用BETWEEN作为条件分片键。算法中使用shardingValue.getValueRange()获取BETWEEN后的值</p>
+     * Calculate the set of shard result names based on the shard value and SQL's BETWEEN operator.<br/>
+     * <p>do Between Sharding uses BETWEEN as the conditional sharding key in WHERE. Use sharding Value.get Value Range() in the algorithm to get the value after BETWEEN</p>
      *
-     * @param availableTargetNames 所有的可用目标名称集合, 一般是数据源或表名称
-     * @param shardingValue        分片值
+     * @param availableTargetNames A collection of all available target names, typically data source or table names
+     * @param shardingValue        Sharding value
      *
-     * @return 分片后指向的目标名称集合, 一般是数据源或表名称
+     * @return The set of target names pointed to after sharding, usually the data source or table name
      */
     @Override
     public Collection<String> doBetweenSharding(Collection<String> availableTargetNames, ShardingValue<String> shardingValue) {
 
-        log.error("[数据库策略] 该分片键不支持使用between...and 语法进行查询");
+        log.error("[Database Policy] The shard key does not support querying using the between...and syntax");
         return null;
 
 //        Collection<String> result = new LinkedHashSet<>(availableTargetNames.size());

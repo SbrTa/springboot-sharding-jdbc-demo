@@ -6,13 +6,8 @@ import org.apache.ibatis.annotations.*;
 import java.sql.Date;
 import java.util.List;
 
-/**
- * @description
- * @create 2017-02-07 下午9:58
- * @email gxz04220427@163.com
- */
 @Mapper
-public interface PaymentRepository {
+public interface PaymentMapper {
 
     @Insert("insert into payment (id,currency,region,amount,product,time) values (#{id},#{currency},#{region},#{amount},#{product},#{time})")
     void insertPayment(Payment payment);
@@ -26,8 +21,5 @@ public interface PaymentRepository {
 
     @SelectProvider(type = PaymentProvider.class , method = "listPaymentForPage")
     List<Payment> listPaymentForPage(@Param(value = "currency")String currency , @Param(value = "region") String region , @Param(value = "startDate") Date startDate, @Param(value = "endDate") Date endDate, @Param(value = "startPage") Integer startPage, @Param(value = "pageSize") Integer pageSize);
-
-
-
 
 }

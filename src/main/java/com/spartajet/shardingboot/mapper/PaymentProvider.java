@@ -8,7 +8,6 @@ import java.sql.Date;
 
 public class PaymentProvider {
 
-
     private final static String LIST_SQL ="select t.id , t.`currency` , t.region , t.amount , t.product , t.time from payment as t where 1=1 ";
 
     public String listPaymentByCondition(@Param(value = "currency")String currency , @Param(value = "region") String region , @Param(value = "startDate") Date startDate, @Param(value = "endDate")Date endDate){

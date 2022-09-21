@@ -4,20 +4,15 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * @Author hzj
- * @Date 2017/7/7 11:17
- * @Description :
- */
+
 public class ShardingUtils {
     /**
-     * 获取分片键的默认值集合
+     * Get the default collection of shard keys
      *
      * @param shardingKey
      * @return
      */
     public static Set<Object> defaultShardingValues(String shardingKey){
-
         Set valueSet = new HashSet<Object>();
 
         if("currency".equals(shardingKey)){
@@ -32,6 +27,4 @@ public class ShardingUtils {
         }
         return valueSet;
     }
-
-
 }

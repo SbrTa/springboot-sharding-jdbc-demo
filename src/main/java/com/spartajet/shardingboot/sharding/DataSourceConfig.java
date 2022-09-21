@@ -28,19 +28,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * @description
- * @create 2017-02-07 下午8:57
- * @email gxz04220427@163.com
- */
 @Configuration
 public class DataSourceConfig {
-
-    /**
-     *
-     * 此处通过加载资源文件，获取数据库的相关配置信息
-     *
-     */
     @Value("classpath:database.json")
     private Resource databaseFile;
 
@@ -48,17 +37,11 @@ public class DataSourceConfig {
     @Lazy
     public List<Database> databases() throws IOException {
         String databasesString = IOUtils.toString(databaseFile.getInputStream(), Charset.forName("UTF-8"));
-        //json  转化为 数据源先关信息实体
         List<Database> databases = new Gson().fromJson(databasesString, new TypeToken<List<Database>>() {}.getType());
         return databases;
     }
 
-    /**
-     * TODO 此处可改造为使用Durid数据库连接池作为数据源
-     *
-     * @param databases
-     * @return
-            */
+
 //    @Bean
 //    public HashMap<String, DataSource> dataSourceMap(List<Database> databases) {
 //        HashMap<String, DataSource> dataSourceMap = new HashMap<>();
@@ -74,11 +57,7 @@ public class DataSourceConfig {
 //        return dataSourceMap;
 //    }
 
-    /**
-     * druid 数据源
-     *
-     * @return
-     */
+
     @Bean(name = "dataSource_bd")
     @Qualifier(value = "dataSource_bd")
     @ConfigurationProperties(prefix = "spring.datasource_bd")
@@ -86,11 +65,7 @@ public class DataSourceConfig {
         return DataSourceBuilder.create().type(com.alibaba.druid.pool.DruidDataSource.class).build();
     }
 
-    /**
-     * druid 数据源
-     *
-     * @return
-     */
+
     @Bean(name = "dataSource_us")
     @Qualifier(value = "dataSource_us")
     @ConfigurationProperties(prefix = "spring.datasource_us")
@@ -98,13 +73,6 @@ public class DataSourceConfig {
         return DataSourceBuilder.create().type(com.alibaba.druid.pool.DruidDataSource.class).build();
     }
 
-    /**
-     * 必须指定不同数据源对应的Bean的Qualifier 名称
-     *
-     * @param dataSource_bd
-     * @param dataSource_us
-     * @return
-     */
     @Bean
     @Autowired
     public HashMap<String, DataSource> dataSourceMap(@Qualifier(value = "dataSource_bd") DataSource dataSource_bd ,@Qualifier(value = "dataSource_us")DataSource dataSource_us) {

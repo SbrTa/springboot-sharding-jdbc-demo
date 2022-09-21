@@ -1,38 +1,40 @@
-> 项目中遇到了分库分表的问题，找到了shrding-jdbc，于是就搞了一个springboot+sharding-jdbc+mybatis的增量分片的应用。今天写博客总结一下遇到的坑。
+> I encountered the problem of sub-database and sub-table in the project, and found shrding-jdbc, so I started an incremental 
+> sharding application of springboot+sharding-jdbc+mybatis. Write a blog today to summarize the pits encountered.
 > 
-> 其实，我自己写了一个increament-jdbc组件的，当我读了sharding-jdbc的源码之后，发现思路和原理差不多，sharding这个各方面要比我的强，毕竟我是一天之内赶出来的东东。
+> In fact, I wrote an increase-jdbc component myself. When I read the source code of sharding-jdbc, I found that the ideas and principles are similar, 
+> and sharding is better than mine in all aspects. After all, I was driven out in one day. East.
 > 
-> 示例代码地址:https://gitee.com/spartajet/springboot-sharding-jdbc-demo.git
 > 
-> demo没有写日志，也没有各种异常判断，只是说明问题
+> The demo does not write logs, nor does it have any abnormal judgment, just to illustrate the problem
 
-## 一、需求背景
-我的项目背景就不说了，现在举一个例子吧：A,B两支股票都在上海，深圳上市，需要实时记录这两支股票的交易tick(不懂tick也没有关系)。现在的分片策略是：上海、深圳分别建库，每个库都存各自交易所的两支股票的ticktick，且按照月分表。如图：
-
+## 1. Background
+I won't go into the background of the project, but let's take an example now: the service is available in Bangladesh and USA, you have option 
+to make payment in BDT or USD. The current sharding strategy is as follows: Bangladesh and USA build separate database, and each stores 
+payments for BDT and USD currency and divides them according to the monthly schedule. As shown below:
 * db_bd
-	* tick_bdt_2017_01
-	* tick_usd_2017_01
+	* payment_bdt_2022_01
+	* payment_usd_2022_01
 	* ........
-	* tick_bdt_2017_12
-	* tick_usd_2017_12
+	* payment_bdt_2022_12
+	* payment_usd_2022_12
 * db_us
-  * tick_bdt_2017_01
-	* tick_usd_2017_01
+    * payment_bdt_2022_01
+	* payment_usd_2022_01
 	* ........
-	* tick_bdt_2017_12
-	* tick_usd_2017_12
+	* payment_bdt_2022_12
+	* payment_usd_2022_12
 
-	分库分表就是这样的。根据这个建库。
+  The sub-library sub-table is like this. Build a library based on this.
 	
-	**千万不要讨论这样分库分表是否合适，这里这样分片只是举个栗子，说明分库分表这个事情。**
+	**Don't discuss whether it is appropriate to sub-database and sub-table. Here, this kind of fragmentation is just a chestnut to illustrate the matter of sub-database and sub-table.**
 	
-	**Sharding-jdbc是不支持建库的SQL，如果像我这样增量的数据库和数据表，那就要一次性把一段时期的数据库和数据表都要建好。**
+	**Sharding-jdbc is SQL that does not support database building. If you have incremental databases and data tables like me, you need to build databases and data tables for a period of time at one time.**
 
-## 二、建库 
-考虑到表确实多，所以我就只建1，2月份的表。语句见demo文件。
-## 三、springboot集成sharding-jdbc
-mvn配置pom如下：
+## 2. Building a library
+Considering that there are indeed many tables, I only build tables for two months. See the demo file for the statement.
 
+## 3. Springboot integrated sharding-jdbc
+The maven configuration pom is as follows:
 ```xml
 <groupId>com.spartajet</groupId>
 	<artifactId>springboot-sharding-jdbc-demo</artifactId>
@@ -176,8 +178,8 @@ mvn配置pom如下：
 	</build>
 ```
 其实这个和sharding-jdbc的官网差不多。其实我想写一个`sharding-jdbc-spring-boot-starter`的pom的，等项目业务都做完再说吧。
-## 四、配置数据源
-我想将数据库做成可配置的，所以我没有在`application.properties`文件中直接配置数据库，而是写在了`database.json`文件中。
+## 4. Configure the data source
+I want to make the database configurable, so instead of configuring the database directly in the `application.properties` file, I write it in the `database.json` file.
 
 ```json
 [
@@ -197,8 +199,7 @@ mvn配置pom如下：
   }
 ]
 ```
-然后在springboot读取database文件，加载方式如下：
-
+Then read the database file in springboot, and the loading method is as follows:
 ```java
 @Value("classpath:database.json")
     private Resource databaseFile;
@@ -211,8 +212,7 @@ mvn配置pom如下：
         return databases;
     }
 ```
-加载完database信息之后，可以通过工厂方法配置逻辑数据库：
-
+After loading the database information, you can configure the logical database through the factory method:
 ```java
     @Bean
     public HashMap<String, DataSource> dataSourceMap(List<Database> databases) {
@@ -229,83 +229,98 @@ mvn配置pom如下：
         return dataSourceMap;
     }
 ```
-这样就把各个逻辑数据库就加载好了。
-## 五、配置分片策略
+In this way, each logical database is loaded.
+## 5. Configure the sharding strategy
 
-### 5.1数据库分片策略
-在这个实例中，数据库的分库就是根据上海(sh)和深圳(sz)来分的，在sharding-jdbc中是单键分片。根据官方文档实现接口`SingleKeyDatabaseShardingAlgorithm`就可以
+### 5.1 Database sharding strategy
+In this example, the sub-database of the database is divided according to Bangladesh (bd) and USA (us), and in sharding-jdbc, 
+it is a single-key sharding. You can implement the interface `Single Key Database Sharding Algorithm` according to the official documentation
 
 ```java
 @service
 public class DatabaseShardingAlgorithm implements SingleKeyDatabaseShardingAlgorithm<String> {
-    /**
-     * 根据分片值和SQL的=运算符计算分片结果名称集合.
-     *
-     * @param availableTargetNames 所有的可用目标名称集合, 一般是数据源或表名称
-     * @param shardingValue        分片值
-     *
-     * @return 分片后指向的目标名称, 一般是数据源或表名称
-     */
-    @Override
-    public String doEqualSharding(Collection<String> availableTargetNames, ShardingValue<String> shardingValue) {
-        String databaseName = "";
-        for (String targetName : availableTargetNames) {
-            if (targetName.endsWith(shardingValue.getValue())) {
-                databaseName = targetName;
-                break;
-            }
-        }
-        return databaseName;
-    }
+	/**
+	 * Calculate shard result name set based on shard value and SQL's = operator.<br/>
+	 *  <p>do Equal Sharding uses = as a conditional sharding key in WHERE. Use sharding Value.get Value() in the algorithm to get the value after equal =</p>
+	 *
+	 * @param availableTargetNames A collection of all available target names, typically data source or table names
+	 * @param shardingValue        Sharding value
+	 *
+	 * @return The target name pointed to after sharding, usually the name of the data source or table
+	 */
+	@Override
+	public String doEqualSharding(Collection<String> availableTargetNames, ShardingValue<String> shardingValue) {
+		String databaseName = "";
+		for (String targetName : availableTargetNames) {
+			if (targetName.endsWith(shardingValue.getValue())) {
+				databaseName = targetName;
+				break;
+			}
+		}
+		return databaseName;
+	}
 }
 ```
-此接口还有另外两个方法，`doInSharding`和`doBetweenSharding`，因为我暂时不用IN和BETWEEN方法，所以就没有写，直接返回null。
-
-### 5.2数据表分片策略
-数据表的分片策略是根据股票和时间共同决定的，在sharding-jdbc中是多键分片。根据官方文档，实现`MultipleKeysTableShardingAlgorithm`接口就OK了
+There are two other methods in this interface, `do In Sharding` and `do Between Sharding`, because I don't use the IN and BETWEEN methods 
+for the time being, so I didn't write them, and returned null directly.
+### 5.2 Data table fragmentation strategy
+The sharding strategy of the data table is jointly determined according to the stock and time. In sharding-jdbc, it is multi-key sharding. 
+According to the official documentation, it is OK to implement the `Multiple Keys Table Sharding Algorithm` interface
 
 ```java
 @service
 public class TableShardingAlgorithm implements MultipleKeysTableShardingAlgorithm {
-    /**
-     * 根据分片值计算分片结果名称集合.
-     *
-     * @param availableTargetNames 所有的可用目标名称集合, 一般是数据源或表名称
-     * @param shardingValues       分片值集合
-     *
-     * @return 分片后指向的目标名称集合, 一般是数据源或表名称
-     */
-    @Override
-    public Collection<String> doSharding(Collection<String> availableTargetNames, Collection<ShardingValue<?>> shardingValues) {
-        String currency = null;
-        Date time = null;
-        for (ShardingValue<?> shardingValue : shardingValues) {
-            if (shardingValue.getColumnName().equals("currency")) {
-				currency = ((ShardingValue<String>) shardingValue).getValue();
-            }
-            if (shardingValue.getColumnName().equals("time")) {
-                time = ((ShardingValue<Date>) shardingValue).getValue();
-            }
-            if (currency != null && time != null) {
-                break;
-            }
-        }
-        String timeString = new SimpleDateFormat("yyyy_MM").format(time);
-        String suffix = currency + "_" + timeString;
-        Collection<String> result = new LinkedHashSet<>();
-        for (String targetName : availableTargetNames) {
-            if (targetName.endsWith(suffix)) {
-                result.add(targetName);
-            }
-        }
-        return result;
-    }
+	/**
+	 * Calculate shard result name set based on shard value.<br/>
+	 *  <h3>Multi-shard key partition table algorithm</h3>
+	 *  <p>
+	 *      1. Get the value collection for each shard key;<br/>
+	 *      2. Get the Cartesian product of a shard key-value set；<br/>
+	 *      3. Assemble the table name first through the Cartesian product to match the target table；<br/>
+	 *      4. Returns the set of matched target tables；<br/>
+	 *  </p>
+	 *  <h3>Precautions for the multi-shard key table-sharding algorithm</h3>
+	 *  <p>
+	 *      1. It needs to be the same as the single shard key sharding strategy, and the three cases of = , IN , between...and should be handled separately；<br/>
+	 *      2. Mainly some shard keys cannot use between...and conditions；<br/>
+	 *      3. In the multi-sharding key sharding algorithm, if one of the sharding keys is not included in the shardingValues, the target table cannot be hit 
+	 *         (multiple sharding keys either all exist or none of them exist, and if some of them exist, it will arrive at The target table cannot be hit); 
+	 *         therefore, it is necessary to deal with the existence of the shard key part in the SQL condition<br/>
+	 *  </p>
+	 *
+	 * @param availableTargetNames A collection of all available target names, typically data source or table names
+	 * @param shardingValues       Shard value collection
+	 *
+	 * @return The set of target names pointed to after sharding, usually the data source or table name
+	 */
+	@Override
+	public Collection<String> doSharding(Collection<String> availableTargetNames, Collection<ShardingValue<?>> shardingValues) {
+		Collection<String> result = new LinkedHashSet<>();
+		Set<Object> nameValueSet = getShardingValue(shardingValues, "currency");
+		Set<Object> timeValueSet = getShardingValue(shardingValues, "time");
+		Set<List<Object>> valueResult = Sets.cartesianProduct(nameValueSet, timeValueSet);
+		for (List<Object> value : valueResult) {
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy_MM");
+			java.sql.Date date = (java.sql.Date) value.get(1);
+			String timeString = formatter.format(date);
+			String suffix = (String) value.get(0) + "_" + timeString;
+
+			for (String tableName : availableTargetNames) {
+				if (tableName.endsWith(suffix)) {
+					result.add(tableName);
+				}
+			}
+		}
+		if (result.isEmpty())
+			log.info("[Table strategy] ------error, the shard key value in the current SQL misses the target database table-----");
+
+		return result;
+	}
 }
 ```
-这些方法的使用可以查官方文档。
-### 5.3注入分片策略
-以上只是定义了分片算法，还没有形成策略，还没有告诉shrding将哪个字段给分片算法：
-
+The use of these methods can be found in the official documentation
+### 5.3 Injection sharding strategy
+The above only defines the sharding algorithm, but has not yet formed a strategy, and has not told sharding which field to assign to the sharding algorithm:
 ```
 @Configuration
 public class ShardingStrategyConfig {
@@ -325,11 +340,12 @@ public class ShardingStrategyConfig {
     }
 }
 ```
-这样才能形成完成的分片策略。
-## 六、配置Sharding-jdbc的DataSource
+In this way, a completed sharding strategy can be formed
+## 6. Configure the Data Source of Sharding-jdbc
 
-sharding-jdbc的原理其实很简单，就是自己做一个DataSource给上层应用使用，这个DataSource包含所有的逻辑库和逻辑表，应用增删改查时，他自己再修改sql，然后选择合适的数据库继续操作。所以这个DataSource创建很重要。
-
+The principle of sharding-jdbc is actually very simple. It is to create a Data Source for the upper-layer application to use. 
+This Data Source contains all the logical libraries and logical tables. When adding, deleting, modifying and checking the application, 
+he will modify the SQL by himself, and then select the appropriate database to continue. operate. So this Data Source creation is very important
 ```java
     @Bean
     @Primary
@@ -341,38 +357,37 @@ sharding-jdbc的原理其实很简单，就是自己做一个DataSource给上层
         return shardingDataSource;
     }
 ```
-**这里要着重说一下为什么要用@Primary这个注解，没有这个注解是会报错的，错误大致意思就是DataSource太多了，mybatis不知道用哪个。加上这个mybatis就知道用sharding的DataSource了。这里参考的是jpa的多数据源配置**
-
-## 七、配置mybatis
+Here I want to focus on why the @Primary annotation is used. Without this annotation, an error will be reported. The general meaning 
+of the error is that there are too many Data Sources, and mybatis does not know which one to use. Add this mybatis to know the Data Source of sharding. 
+The reference here is the multi-data source configuration of jpa
+## 7. configure mybatis
 ### 7.1 Bean
 
 ```java
-public class Tick {
-    private long id;
-    private String currency;
-    private String region;
-    private int amount;
-    private int product;
-    private Date time;
+public class Payment {
+	private long id;
+	private String currency;
+	private String region;
+	private double amount;
+	private int product;
+	private Date time;
 }
 ```
 ### 7.2 Mapper
-很简单，只实现一个插入方法
-
+Very simple, just implement an insert method
 ```java
 @Mapper
-public interface TickMapper {
-    @Insert("insert into payment (id,currency,region,amount,product,time) values (#{id},#{currency},#{region},#{amount},#{product},#{time})")
-    void insertTick(Tick payment);
+public interface PaymentMapper {
+	@Insert("insert into payment (id,currency,region,amount,product,time) values (#{id},#{currency},#{region},#{amount},#{product},#{time})")
+	void insertPayment(Payment payment);
 }
 ```
-### 7.3 SessionFactory配置
-还要设置一下tick的SessionFactory：
-
+### 7.3 Session Factory configuration
+Also set up payment's Session Factory:
 ```
 @Configuration
 @MapperScan(basePackages = "com.spartajet.shardingboot.mapper", sqlSessionFactoryRef = "sessionFactory")
-public class TickSessionFactoryConfig {
+public class SessionFactoryConfig {
     @Bean
     public SqlSessionFactory sessionFactory(DataSource shardingDataSource) throws Exception {
         final SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();
@@ -388,29 +403,29 @@ public class TickSessionFactoryConfig {
     }
 }
 ```
-这里添加了一个`CommonSelfIdGenerator`，sharding自带的id生成器，看了下代码和`facebook`的`snowflake`类似。我又不想把数据库的主键设置成自增的，否则数据双向同步会死的很惨的。
+A `Common Self Id Generator` is added here, the id generator that comes with sharding, and the code is similar to `facebook`'s `snowflake`. 
+I don't want to set the primary key of the database to be self-incrementing, otherwise the two-way synchronization of the data will die miserably.
 ### 
-## 八、测试写入
+## 8. test write
 
 ```
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
+@Slf4j
 public class SpringbootShardingJdbcDemoApplicationTests {
     @Autowired
-    private TickMapper tickMapper;
+    private PaymentMapper paymentMapper;
     @Autowired
     private CommonSelfIdGenerator commonSelfIdGenerator;
-    
-    
-    @Test
-    public void contextLoads() {
-        Tick payment = new Tick(commonSelfIdGenerator.generateId().longValue(), "bdt", "bd", 100, 200, new Date());
-        this.tickMapper.insertTick(payment);
-    }
 
+    @Test
+    public void insertTest() {
+        Payment payment = new Payment(commonSelfIdGenerator.generateId().longValue(), "usd", "bd", 300, 100, getDate("2022-09-11"));
+        this.paymentMapper.insertPayment(payment);
+    }
 }
 ```
-成功实现增量分库分表！！！
+Successfully implemented incremental database and table division！！！
 
 
 

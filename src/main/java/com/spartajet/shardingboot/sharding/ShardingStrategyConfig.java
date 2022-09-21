@@ -10,11 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.Collection;
 import java.util.LinkedList;
 
-/**
- * @description
- * @create 2017-02-07 下午9:35
- * @email gxz04220427@163.com
- */
+
 @Configuration
 public class ShardingStrategyConfig {
     @Bean

@@ -2,7 +2,7 @@ package com.spartajet.shardingboot;
 
 import com.dangdang.ddframe.rdb.sharding.id.generator.self.CommonSelfIdGenerator;
 import com.spartajet.shardingboot.bean.Payment;
-import com.spartajet.shardingboot.mapper.PaymentRepository;
+import com.spartajet.shardingboot.mapper.PaymentMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,7 +21,7 @@ import java.util.List;
 @Slf4j
 public class SpringbootShardingJdbcDemoApplicationTests {
     @Autowired
-    private PaymentRepository paymentRepository;
+    private PaymentMapper paymentMapper;
     @Autowired
     private CommonSelfIdGenerator commonSelfIdGenerator;
 
@@ -29,24 +29,24 @@ public class SpringbootShardingJdbcDemoApplicationTests {
     @Test
     public void insertTest() {
         Payment payment = new Payment(commonSelfIdGenerator.generateId().longValue(), "usd", "bd", 300, 100, getDate("2022-09-11"));
-        this.paymentRepository.insertPayment(payment);
+        this.paymentMapper.insertPayment(payment);
     }
 
     @Test
     public void selectAllTest() {
-        List<Payment> list = this.paymentRepository.listAll();
+        List<Payment> list = this.paymentMapper.listAll();
         list.forEach(System.out::println);
     }
 
     @Test
     public void selectByConditionTest() {
-        List<Payment> list = this.paymentRepository.listPaymentByCondition("usd", "us", getDate("2022-08-01"), getDate("2022-10-01"));
+        List<Payment> list = this.paymentMapper.listPaymentByCondition("usd", "us", getDate("2022-08-01"), getDate("2022-10-01"));
         list.forEach(System.out::println);
     }
 
     @Test
     public void selectForPageTest() {
-        List<Payment> list = this.paymentRepository.listPaymentForPage("bdt", "bd", getDate("2022-01-01"), getDate("2022-10-30"), 1, 10);
+        List<Payment> list = this.paymentMapper.listPaymentForPage("bdt", "bd", getDate("2022-01-01"), getDate("2022-10-30"), 1, 10);
         list.forEach(System.out::println);
     }
 
