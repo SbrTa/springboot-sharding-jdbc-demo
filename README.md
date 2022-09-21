@@ -36,7 +36,12 @@ Considering that there are indeed many tables, I only build tables for two month
 ## 3. Springboot integrated sharding-jdbc
 The maven configuration pom is as follows:
 ```xml
-<groupId>com.spartajet</groupId>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.spartajet</groupId>
 	<artifactId>springboot-sharding-jdbc-demo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
@@ -44,60 +49,96 @@ The maven configuration pom is as follows:
 	<name>springboot-sharding-jdbc-demo</name>
 	<description>Springboot integrate Sharding-jdbc Demo</description>
 
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.4.1.RELEASE</version>
+		<relativePath></relativePath>
+	</parent>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.build.locales>zh_CN</project.build.locales>
-		<java.version>1.8</java.version>
+		<java.version>11</java.version>
 		<project.build.jdk>${java.version}</project.build.jdk>
 		<spring.boot.version>1.4.1.RELEASE</spring.boot.version>
 		<com.alibaba.druid.version>1.0.13</com.alibaba.druid.version>
-		<mysql-connector-java.version>5.1.36</mysql-connector-java.version>
+		<mysql-connector-java.version>8.0.11</mysql-connector-java.version>
 		<sharding-jdbc.version>1.4.1</sharding-jdbc.version>
 		<com.google.code.gson.version>2.8.0</com.google.code.gson.version>
 		<joda-trade.version>2.9.7</joda-trade.version>
 		<commons-dbcp.version>1.4</commons-dbcp.version>
 		<commons-io.version>2.5</commons-io.version>
-		<mybatis-spring-boot-starter.version>1.2.0</mybatis-spring-boot-starter.version>
+		<mybatis-spring-boot-starter.version>2.2.0</mybatis-spring-boot-starter.version>
+
+		<disruptor.version>3.3.6</disruptor.version>
+		<log4j.version>2.7</log4j.version>
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-jdbc</artifactId>
-			<version>${spring.boot.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mybatis.spring.boot</groupId>
-			<artifactId>mybatis-spring-boot-starter</artifactId>
-			<version>${mybatis-spring-boot-starter.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-			<version>${commons-dbcp.version}</version>
-		</dependency>
+
 		<dependency>
 			<groupId>com.dangdang</groupId>
 			<artifactId>sharding-jdbc-core</artifactId>
 			<version>${sharding-jdbc.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.dangdang</groupId>
 			<artifactId>sharding-jdbc-config-spring</artifactId>
 			<version>${sharding-jdbc.version}</version>
 		</dependency>
+
 		<dependency>
 			<groupId>com.dangdang</groupId>
 			<artifactId>sharding-jdbc-self-id-generator</artifactId>
 			<version>${sharding-jdbc.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.dangdang</groupId>
+			<artifactId>sharding-jdbc-transaction</artifactId>
+			<version>${sharding-jdbc.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${commons-io.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-dbcp</groupId>
+			<artifactId>commons-dbcp</artifactId>
+			<version>${commons-dbcp.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 			<version>${com.google.code.gson.version}</version>
 		</dependency>
+
+
+		<dependency>
+			<groupId>org.mybatis.spring.boot</groupId>
+			<artifactId>mybatis-spring-boot-starter</artifactId>
+			<version>${mybatis-spring-boot-starter.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis-typehandlers-jsr310</artifactId>
+			<version>1.0.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>${mysql-connector-java.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -109,23 +150,50 @@ The maven configuration pom is as follows:
 				</exclusion>
 			</exclusions>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<version>${spring.boot.version}</version>
 			<scope>test</scope>
 		</dependency>
+
+		<!--Configure Log4j2 logging begin -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-log4j2</artifactId>
-			<version>${spring.boot.version}</version>
 			<exclusions>
 				<exclusion>
-					<groupId>log4j</groupId>
-					<artifactId>log4j</artifactId>
+					<groupId>org.apache.logging.log4j</groupId>
+					<artifactId>log4j-web</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-1.2-api</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-web</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.lmax</groupId>
+			<artifactId>disruptor</artifactId>
+			<version>${disruptor.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.3.0</version>
+		</dependency>
+		<!--Configure Log4j2 logging  end -->
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
@@ -145,11 +213,14 @@ The maven configuration pom is as follows:
 				</exclusion>
 			</exclusions>
 		</dependency>
+
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>${mysql-connector-java.version}</version>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.24</version>
+			<scope>provided</scope>
 		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -176,8 +247,9 @@ The maven configuration pom is as follows:
 			</plugin>
 		</plugins>
 	</build>
+</project>
 ```
-其实这个和sharding-jdbc的官网差不多。其实我想写一个`sharding-jdbc-spring-boot-starter`的pom的，等项目业务都做完再说吧。
+In fact, this is similar to the official website of sharding-jdbc. In fact, I want to write a pom of `sharding-jdbc-spring-boot-starter`, and I will talk about it when the project business is finished.
 ## 4. Configure the data source
 I want to make the database configurable, so instead of configuring the database directly in the `application.properties` file, I write it in the `database.json` file.
 

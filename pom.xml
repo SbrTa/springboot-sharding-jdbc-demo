@@ -120,7 +120,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!--配置Log4j2日志 begin -->
+		<!--Configure Log4j2 logging begin -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-log4j2</artifactId>
@@ -154,7 +154,7 @@
 			<artifactId>jaxb-api</artifactId>
 			<version>2.3.0</version>
 		</dependency>
-		<!--配置Log4j2日志  end -->
+		<!--Configure Log4j2 logging  end -->
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
