@@ -1,12 +1,6 @@
-> I encountered the problem of sub-database and sub-table in a project, and found sharding-jdbc, so I started an incremental 
+> I was working on sub-database and sub-table for learning purpose, and found sharding-jdbc, so I started an incremental 
 > sharding application of springboot+sharding-jdbc+mybatis. 
 > 
-> In fact, I wrote an increase-jdbc component myself. When I read the source code of sharding-jdbc, I found that the ideas and principles are similar, 
-> and sharding is better than mine in all aspects. After all, I was driven out in one day.
-> 
-> 
-> The demo does not write logs, nor does it have any abnormal judgment, just to illustrate the problem
-
 ## 1. Background
 I won't go into the background of the project, but let's take an example: the service is available in Bangladesh and USA, you have option 
 to make payment in BDT or USD. The current sharding strategy is as follows: region Bangladesh and USA has separate database, and each stores 
